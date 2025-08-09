@@ -22,19 +22,22 @@ public class Lexer {
     public Lexer(String fileContents) {
         source = fileContents;
     }
-
+// for
+//    s
+//    c
     public List<Token> scan() {
 
-        while(curr < source.length()){
+        while(curr < source.length()) {
             char current = getCurrMoveNext();
-            scan(current);
+            handleToken(current);
+            start = curr;
         }
 
         addToken(EOF, null);
         return tokens;
     }
 
-    private void scan(char current) {
+    private void handleToken(char current) {
         switch (current){
             case '(':
                 addToken(LEFT_PAREN, null);
