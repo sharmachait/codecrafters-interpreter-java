@@ -45,6 +45,12 @@ public class Lexer {
             case ')':
                 addToken(RIGHT_PAREN, null);
                 break;
+            case '{':
+                addToken(LEFT_BRACE, null);
+                break;
+            case '}':
+                addToken(RIGHT_BRACE, null);
+                break;
         }
     }
 }
