@@ -94,7 +94,7 @@ public class Lexer {
                 addToken(SLASH, null);
                 break;
             default:
-                ScanException e = new ScanException("[line"+line+"] Error: Unexpected character: "+current);
+                ScanException e = new ScanException("[line "+line+"] Error: Unexpected character: "+current);
                 System.err.println(e.getMessage());
                 return e;
         }
