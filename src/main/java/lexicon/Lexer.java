@@ -130,6 +130,7 @@ public class Lexer {
                     curr++;
                     addToken(BANG_EQUAL, null);
                 }
+                break;
             case '<':
                 if(next == null || next!='='){
                     addToken(LESS, null);
