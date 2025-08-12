@@ -5,6 +5,9 @@ import java.util.List;
 import static lexicon.TokenType.*;
 
 public class Lexer {
+    public Lexer(String fileContents) {
+        source = fileContents;
+    }
     private final String source;
     private char getCurrMoveNext(){
         return source.charAt(curr++);
@@ -13,23 +16,23 @@ public class Lexer {
         if(curr >= source.length()) return null;
         return source.charAt(curr);
     }
+    private Character getNextNext() {
+        int next = curr+1;
+        if(next >= source.length()) return null;
+        return source.charAt(next);
+    }
+
     private int line = 1;
     private int curr = 0;
-    private int start = 0; // (()
-                           // s
-                           //  c
+    private int start = 0;
+
     private final List<Token> tokens = new ArrayList<>();
     private void addToken(TokenType type, Object literal) {
         String lexeme = source.substring(start,curr);
         tokens.add(new Token(type, lexeme, literal, line));
     }
-    public Lexer(String fileContents) {
-        source = fileContents;
-    }
-// for
-//    s
-//    c
-    public static class Result{
+
+    public static class Result {
         public final List<Token> tokens;
         public final Exception exception;
 
@@ -92,16 +95,12 @@ public class Lexer {
             case '*':
                 addToken(STAR, null);
                 break;
-            case '=', '!', '<', '>':
+            case '=', '!', '<', '>', '/':
                 ScanException dualCharError = handleDualCharacterTokens(current);
                 if(dualCharError!=null) {
                     System.err.println(dualCharError.getMessage());
                     return dualCharError;
                 }
-                break;
-            case '/':
-                // maybe multi character
-                addToken(SLASH, null);
                 break;
             default:
                 ScanException e = new ScanException("[line "+line+"] Error: Unexpected character: "+current);
@@ -147,9 +146,45 @@ public class Lexer {
                     addToken(GREATER_EQUAL, null);
                 }
                 break;
+            case '/':
+                if(next == null || (next != '/' && next != '*')){
+                    addToken(SLASH,null);
+                }else{
+                    curr++;
+                    if(next == '/') discardLine();
+                    else e = discardMultipleLines();
+                }
+                break;
             default:
                 throw new RuntimeException("Invalid character passed in to be checked for dual character token");
         }
         return e;
+    }
+    private void discardLine() {
+        while(curr < source.length() && getNext() != '\n'){
+            curr++;
+        }
+    }
+    private ScanException discardMultipleLines() {
+        while(curr < source.length() &&
+                curr+1 < source.length() &&
+                !(getNext() == '*' && getNextNext() == '/')
+        ){
+            if(getNext() == '\n') line++;
+            curr++;
+        }
+        if(curr >= source.length()){
+            ScanException e = new ScanException("[line "+line+"] Unterminated multi line comment.");
+            System.err.println(e.getMessage());
+            return e;
+        }
+        if(curr+1 >= source.length()){
+            ScanException e = new ScanException("[line "+line+"] Unterminated multi line comment.");
+            System.err.println(e.getMessage());
+            return e;
+        }
+        curr++; // *
+        curr++; // /
+        return null;
     }
 }
