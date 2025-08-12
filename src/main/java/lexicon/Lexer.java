@@ -95,6 +95,11 @@ public class Lexer {
             case '*':
                 addToken(STAR, null);
                 break;
+            case ' ','\r','\t':
+                break;
+            case '\n':
+                line++;
+                break;
             case '=', '!', '<', '>', '/':
                 ScanException dualCharError = handleDualCharacterTokens(current);
                 if(dualCharError!=null) {
