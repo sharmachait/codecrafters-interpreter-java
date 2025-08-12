@@ -92,7 +92,7 @@ public class Lexer {
             case '*':
                 addToken(STAR, null);
                 break;
-            case '=':
+            case '=', '!':
                 ScanException dualCharError = handleDualCharacterTokens(current);
                 if(dualCharError!=null) {
                     System.err.println(dualCharError.getMessage());
@@ -121,6 +121,14 @@ public class Lexer {
                 }else{
                     curr++;
                     addToken(EQUAL_EQUAL, null);
+                }
+                break;
+            case '!':
+                if(next == null || next!='='){
+                    addToken(BANG, null);
+                }else{
+                    curr++;
+                    addToken(BANG_EQUAL, null);
                 }
                 break;
             default:
