@@ -9,6 +9,10 @@ public class Lexer {
     private char getCurrMoveNext(){
         return source.charAt(curr++);
     }
+    private Character getNext() {
+        if(curr >= source.length()) return null;
+        return source.charAt(curr);
+    }
     private int line = 1;
     private int curr = 0;
     private int start = 0; // (()
@@ -88,7 +92,13 @@ public class Lexer {
             case '*':
                 addToken(STAR, null);
                 break;
-
+            case '=':
+                ScanException dualCharError = handleDualCharacterTokens(current);
+                if(dualCharError!=null) {
+                    System.err.println(dualCharError.getMessage());
+                    return dualCharError;
+                }
+                break;
             case '/':
                 // maybe multi character
                 addToken(SLASH, null);
@@ -99,5 +109,23 @@ public class Lexer {
                 return e;
         }
         return null;
+    }
+
+    private ScanException handleDualCharacterTokens(char current) {
+        ScanException e = null;
+        Character next = getNext();
+        switch (current){
+            case '=':
+                if(next == null || next!='='){
+                    addToken(EQUAL, null);
+                }else{
+                    curr++;
+                    addToken(EQUAL_EQUAL, null);
+                }
+                break;
+            default:
+                throw new RuntimeException("Invalid character passed in to be checked for dual character token");
+        }
+        return e;
     }
 }

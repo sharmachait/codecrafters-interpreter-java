@@ -18,9 +18,13 @@ public enum TokenType {
     // Maybe single character token
     SLASH,
     BANG,
-    EQUALITY,
+    BANG_EQUAL,
+    EQUAL,
+    EQUAL_EQUAL,
     GREATER,
+    GREATER_EQUAL,
     LESS,
+    LESS_EQUAL,
 
     // multi character tokens
     IDENTIFIER,
