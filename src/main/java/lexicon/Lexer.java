@@ -120,7 +120,8 @@ public class Lexer {
     private void identifier() {
         while(curr < source.length() && isAlphaNumberic(getCurr())) getCurrMoveNext();
         String text = source.substring(start, curr);
-        addToken(IDENTIFIER, null);
+        TokenType type = Keywords.keywords.getOrDefault(text, IDENTIFIER);
+        addToken(type, null);
     }
 
     private boolean isAlphaNumberic(char curr) {
