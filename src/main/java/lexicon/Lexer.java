@@ -12,11 +12,11 @@ public class Lexer {
     private char getCurrMoveNext(){
         return source.charAt(curr++);
     }
-    private Character getNext() {
+    private Character getCurr() {
         if(curr >= source.length()) return null;
         return source.charAt(curr);
     }
-    private Character getNextNext() {
+    private Character getNext() {
         int next = curr+1;
         if(next >= source.length()) return null;
         return source.charAt(next);
@@ -44,6 +44,7 @@ public class Lexer {
 
     public Result scan() {
         ScanException isException = null;
+        int len = source.length();
         while(curr < source.length()) {
             char current = getCurrMoveNext();
             ScanException currentException = handleToken(current);
@@ -100,24 +101,33 @@ public class Lexer {
             case '\n':
                 line++;
                 break;
+            case '"':
+                return string();
             case '=', '!', '<', '>', '/':
-                ScanException dualCharError = handleDualCharacterTokens(current);
-                if(dualCharError!=null) {
-                    System.err.println(dualCharError.getMessage());
-                    return dualCharError;
-                }
-                break;
+                return handleDualCharacterTokens(current);
             default:
-                ScanException e = new ScanException("[line "+line+"] Error: Unexpected character: "+current);
-                System.err.println(e.getMessage());
-                return e;
+                return new ScanException("[line "+line+"] Error: Unexpected character: "+current);
         }
+        return null;
+    }
+
+    private ScanException string() {
+        while(curr < source.length() && getCurr() != '"') {
+            if(getCurr() == '\n') line++;
+            getCurrMoveNext();
+        }
+        if(curr >= source.length()){
+            return new ScanException("[line "+line+"] Error: Unterminated string.");
+        }
+        getCurrMoveNext();
+        String value = source.substring(start+1, curr-1);
+        addToken(STRING, value);
         return null;
     }
 
     private ScanException handleDualCharacterTokens(char current) {
         ScanException e = null;
-        Character next = getNext();
+        Character next = getCurr();
         switch (current){
             case '=':
                 if(next == null || next!='='){
@@ -166,27 +176,23 @@ public class Lexer {
         return e;
     }
     private void discardLine() {
-        while(curr < source.length() && getNext() != '\n'){
+        while(curr < source.length() && getCurr() != '\n'){
             curr++;
         }
     }
     private ScanException discardMultipleLines() {
         while(curr < source.length() &&
                 curr+1 < source.length() &&
-                !(getNext() == '*' && getNextNext() == '/')
+                !(getCurr() == '*' && getNext() == '/')
         ){
-            if(getNext() == '\n') line++;
+            if(getCurr() == '\n') line++;
             curr++;
         }
         if(curr >= source.length()){
-            ScanException e = new ScanException("[line "+line+"] Unterminated multi line comment.");
-            System.err.println(e.getMessage());
-            return e;
+            return new ScanException("[line "+line+"] Unterminated multi line comment.");
         }
         if(curr+1 >= source.length()){
-            ScanException e = new ScanException("[line "+line+"] Unterminated multi line comment.");
-            System.err.println(e.getMessage());
-            return e;
+            return new ScanException("[line "+line+"] Unterminated multi line comment.");
         }
         curr++; // *
         curr++; // /
