@@ -108,11 +108,27 @@ public class Lexer {
             default:
                 if(Character.isDigit(current)){
                     return number();
-                }else{
+                } else if (isLoxAlpha(current)) {
+                    identifier();
+                } else{
                     return new ScanException("[line "+line+"] Error: Unexpected character: "+current);
                 }
         }
         return null;
+    }
+
+    private void identifier() {
+        while(curr < source.length() && isAlphaNumberic(getCurr())) getCurrMoveNext();
+        String text = source.substring(start, curr);
+        addToken(IDENTIFIER, null);
+    }
+
+    private boolean isAlphaNumberic(char curr) {
+        return isLoxAlpha(curr) || Character.isDigit(curr);
+    }
+
+    private boolean isLoxAlpha(char c) {
+        return c == '_' || Character.isAlphabetic(c);
     }
 
     private ScanException number() {
