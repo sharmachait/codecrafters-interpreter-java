@@ -106,8 +106,28 @@ public class Lexer {
             case '=', '!', '<', '>', '/':
                 return handleDualCharacterTokens(current);
             default:
-                return new ScanException("[line "+line+"] Error: Unexpected character: "+current);
+                if(Character.isDigit(current)){
+                    return number();
+                }else{
+                    return new ScanException("[line "+line+"] Error: Unexpected character: "+current);
+                }
         }
+        return null;
+    }
+
+    private ScanException number() {
+        while(curr<source.length() && Character.isDigit(getCurr())) getCurrMoveNext();
+        if(curr < source.length() && getCurr() == '.'){
+            getCurrMoveNext();
+            if(curr >= source.length() || (curr < source.length() && !Character.isDigit(getCurr()))){
+                return new ScanException("[line "+line+"] Error: expected property name after '.'");
+            } else if (curr < source.length() && Character.isDigit(getCurr())) {
+                while(curr<source.length() && Character.isDigit(getCurr())) getCurrMoveNext();
+            }
+        }
+        String number = source.substring(start, curr);
+        Double obj = Double.parseDouble(number);
+        addToken(NUMBER, obj);
         return null;
     }
 
