@@ -1,7 +1,7 @@
 package lexicon;
 
 public class Token {
-    private final TokenType type;
+    public final TokenType type;
     private final String lexeme;
     private final Object literal;
     public final Integer line;
