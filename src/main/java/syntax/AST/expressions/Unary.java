@@ -2,6 +2,7 @@ package syntax.AST.expressions;
 
 import lexicon.Token;
 import lexicon.TokenType;
+import syntax.AST.analysis.ExpressionVisitor;
 
 public class Unary extends Expression{
     public final Token operator;
@@ -13,5 +14,10 @@ public class Unary extends Expression{
         }
         this.operator = operator;
         this.right = expression;
+    }
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visitUnary(this);
     }
 }
