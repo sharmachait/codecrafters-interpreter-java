@@ -61,7 +61,7 @@ public class Runner {
 
         if(e!=null){
             AstPrinter astPrinter = new AstPrinter();
-            astPrinter.print(e);
+            System.out.println(astPrinter.print(e));
         }else{
             System.exit(65);
         }
