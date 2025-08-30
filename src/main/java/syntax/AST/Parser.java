@@ -84,7 +84,7 @@ public class Parser {
         throw report(peek(), "Expect expression.");
     }
     private Expression expression() {
-        return comma();
+        return ternary();
     }
 
     private Expression comma() {
