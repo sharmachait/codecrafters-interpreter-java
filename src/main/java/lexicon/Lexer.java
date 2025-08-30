@@ -44,7 +44,6 @@ public class Lexer {
 
     public Result scan() {
         ScanException isException = null;
-        int len = source.length();
         while(curr < source.length()) {
             char current = getCurrMoveNext();
             ScanException currentException = handleToken(current);
