@@ -8,7 +8,8 @@ operator       -> "==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/" 
 ```
 
 ## precedence
-1. equality == !=
+comma, ternary
+1. equality == != 
 2. comparison > >= < <=
 3. term - +
 4. factor / *
@@ -18,7 +19,9 @@ operator       -> "==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/" 
 false
 
 ```cfg
-expression     -> equality ;
+expression     -> comma;
+comma          -> ternary ( "," ternary)* ;
+ternary        -> equality ( "?" ternary ":" ternary )* ;
 equality       -> comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           -> factor ( ( "-" | "+" ) factor )* ;

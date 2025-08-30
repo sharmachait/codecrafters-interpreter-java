@@ -84,10 +84,37 @@ public class Parser {
         throw report(peek(), "Expect expression.");
     }
     private Expression expression() {
-        return equality();
+        return comma();
     }
+
+    private Expression comma() {
+        //comma          -> ternary ( "," ternary)* ;
+        handleBinaryOperatorWithoutLeftExpression(COMMA);
+        Expression expr = ternary();
+        while(matchCurrentToken(COMMA)){
+            Token operator = previous();
+            Expression right = ternary();
+            expr = new Binary(operator, expr, right);
+        }
+        return expr;
+    }
+
+    private Expression ternary() {
+        //ternary        -> equality ( "?" ternary ":" ternary )* ;
+        handleBinaryOperatorWithoutLeftExpression(QUESTION);
+        Expression expr = equality();
+        if(matchCurrentToken(QUESTION)){
+            Expression trueBranch = ternary();
+            Token operator =consume(COLON, "Colon Expected after ? of ternary expression.");
+            Expression falseBranch = ternary();
+            expr = new Ternary(expr, trueBranch, falseBranch);
+        }
+        return expr;
+    }
+
     private Expression equality() {
         //equality       -> comparison ( ( "!=" | "==" ) comparison )* ;
+        handleBinaryOperatorWithoutLeftExpression(BANG_EQUAL, EQUAL_EQUAL);
         Expression expr = comparison();
         while(matchCurrentToken(BANG_EQUAL, EQUAL_EQUAL)){
             Token operator = previous();
@@ -99,6 +126,7 @@ public class Parser {
 
     private Expression comparison() {
         //comparison     -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+        handleBinaryOperatorWithoutLeftExpression(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL);
         Expression expr = term();
         while(matchCurrentToken(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)){
             Token operator = previous();
@@ -110,6 +138,7 @@ public class Parser {
 
     private Expression term() {
         //term           -> factor ( ( "-" | "+" ) factor )* ;
+        handleBinaryOperatorWithoutLeftExpression(PLUS);
         Expression expr = factor();
         while(matchCurrentToken(MINUS, PLUS)){
             Token operator = previous();
@@ -121,6 +150,7 @@ public class Parser {
 
     private Expression factor() {
         //factor         -> unary ( ( "/" | "*" ) unary )* ;
+        handleBinaryOperatorWithoutLeftExpression(STAR, SLASH);
         Expression expr = unary();
         while(matchCurrentToken(STAR, SLASH)){
             Token operator = previous();
@@ -139,5 +169,12 @@ public class Parser {
         }
         return primary();
     }
-
+    private void handleBinaryOperatorWithoutLeftExpression(TokenType... types){
+        for(TokenType type: types){
+            if(checkCurrentType(type)){
+                Token operator = advance();
+                report(operator, "Missing left-hand operand for '"+ operator.lexeme+"'");
+            }
+        }
+    }
 }

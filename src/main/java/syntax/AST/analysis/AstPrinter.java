@@ -37,4 +37,24 @@ public class AstPrinter implements ExpressionVisitor<String> {
         if(expr.value == null) return "nil";
         return expr.value.toString();
     }
+
+    @Override
+    public String visitTernary(Ternary ternary) {
+        String trueBranch = ternary.trueBranch.accept(this);
+        String falseBranch = ternary.falseBranch.accept(this);
+        String condition = ternary.condition.accept(this);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        sb.append("(");
+        sb.append(condition);
+        sb.append(") ? ");
+        sb.append(trueBranch);
+        sb.append(" : ");
+        sb.append(falseBranch);
+        sb.append(")");
+        sb.append(")");
+
+        return sb.toString();
+    }
 }
