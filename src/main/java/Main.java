@@ -16,7 +16,11 @@ public class Main {
     }else if(command.equals("parse")){
       Runner.parse(filename);
       return;
+    }else if(command.equals("evaluate")){
+      Runner.evaluate(filename);
+      return;
     }
+
 
     System.err.println("Unknown command: " + command);
     System.exit(1);

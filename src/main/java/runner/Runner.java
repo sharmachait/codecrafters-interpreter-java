@@ -5,6 +5,7 @@ import lexicon.Token;
 import syntax.AST.Parser;
 import syntax.AST.ParserException;
 import syntax.AST.analysis.AstPrinter;
+import syntax.AST.analysis.Interpreter;
 import syntax.AST.expressions.Expression;
 
 import java.io.IOException;
@@ -62,6 +63,31 @@ public class Runner {
         if(e!=null){
             AstPrinter astPrinter = new AstPrinter();
             System.out.println(astPrinter.print(e));
+        }else{
+            System.exit(65);
+        }
+    }
+
+    public static void evaluate(String filename) {
+        String fileContents = getFileContents(filename);
+        if (fileContents == null) return;
+
+        Lexer lexer = new Lexer(fileContents);
+        Lexer.Result result = lexer.scan();
+        if(result.exception != null) {
+            System.exit(65);
+        }
+
+        Parser parser = new Parser(result.tokens);
+        Expression e = parser.parse();
+
+        if(e!=null){
+            Interpreter interpreter = new Interpreter();
+            Object res = interpreter.interpret(e);
+            if(res == null)
+                System.out.println("nil");
+            else
+                System.out.println(res);
         }else{
             System.exit(65);
         }
