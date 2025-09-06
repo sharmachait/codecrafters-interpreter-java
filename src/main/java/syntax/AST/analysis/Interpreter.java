@@ -14,7 +14,7 @@ public class Interpreter implements ExpressionVisitor<Object> {
     public Object visitBinary(Binary expr) {
         Object left = expr.left.accept(this);
         Object right = expr.right.accept(this);
-        switch (expr.operator){
+        switch (expr.operator.type){
             case MINUS:
                 return (double) left - (double) right;
             case PLUS:
@@ -38,9 +38,8 @@ public class Interpreter implements ExpressionVisitor<Object> {
                 return !isEqual(left, right);
             case EQUAL_EQUAL:
                 return isEqual(left, right);
-            default:
-                throw new IllegalStateException("Unexpected value: " + expr.operator);
         }
+        return null;
     }
 
     private boolean isEqual(Object left, Object right) {
@@ -52,14 +51,13 @@ public class Interpreter implements ExpressionVisitor<Object> {
     @Override
     public Object visitUnary(Unary expr) {
         Object right = expr.right.accept(this);
-        switch (expr.operator){
+        switch (expr.operator.type){
             case MINUS:
                 return -(double) right;
             case BANG:
                 return !isTruthy(right);
-            default:
-                return null;
         }
+        return null;
     }
 
     @Override
