@@ -86,8 +86,20 @@ public class Runner {
             Object res = interpreter.interpret(e);
             if(res == null)
                 System.out.println("nil");
-            else
-                System.out.println(res);
+            else{
+                if(res instanceof Double){
+                    Double d = (Double) res;
+                    if(d.intValue() == d){
+                        int val = d.intValue();
+                        System.out.println(val);
+                    }else{
+                        System.out.println(d);
+                    }
+                }else{
+                    System.out.println(res);
+                }
+            }
+
         }else{
             System.exit(65);
         }
