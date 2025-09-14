@@ -71,11 +71,11 @@ public class Parser {
         if(matchCurrentToken(FALSE)) return new Literal(false);
         if(matchCurrentToken(TRUE)) return new Literal(true);
         if(matchCurrentToken(NIL)) return new Literal(null);
-        
+
         if(matchCurrentToken(NUMBER,STRING)){
             return new Literal(previous().literal);
         }
-        
+
         if(matchCurrentToken(LEFT_PAREN)){
             Expression expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");

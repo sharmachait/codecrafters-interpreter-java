@@ -61,7 +61,7 @@ public class Runner {
         Parser parser = new Parser(result.tokens);
         Expression e = parser.parse();
 
-        if(parserException != null && e!=null){
+        if(parserException == null && e!=null){
             AstPrinter astPrinter = new AstPrinter();
             System.out.println(astPrinter.print(e));
         }else{
