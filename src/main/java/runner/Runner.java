@@ -84,6 +84,8 @@ public class Runner {
         if(parserException !=null && e!=null){
             Interpreter interpreter = new Interpreter();
             Object res = interpreter.interpret(e);
+            if(res instanceof InterruptedException)
+                System.exit(70);
             if(res == null)
                 System.out.println("nil");
             else{

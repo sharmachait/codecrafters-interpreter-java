@@ -7,7 +7,13 @@ import static lexicon.TokenType.*;
 public class Interpreter implements ExpressionVisitor<Object> {
 
     public Object interpret(Expression e) {
-        return e.accept(this);
+        try{
+            return e.accept(this);
+        } catch (InterpreterException ex) {
+            System.err.println(ex.getMessage());
+            System.err.println("[line "+ex.token.line+"]");
+            return ex;
+        }
     }
 
     @Override
@@ -53,6 +59,9 @@ public class Interpreter implements ExpressionVisitor<Object> {
         Object right = expr.right.accept(this);
         switch (expr.operator.type){
             case MINUS:
+                if(!(right instanceof Double)){
+                    throw new InterpreterException("Operand must be a number.", expr.operator);
+                }
                 return -(double) right;
             case BANG:
                 return !isTruthy(right);
