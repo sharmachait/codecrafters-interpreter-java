@@ -29,8 +29,14 @@ public class Interpreter implements ExpressionVisitor<Object> {
                 }
                 return (double) left + (double) right;
             case STAR:
+                if(!(left instanceof Double) || !(right instanceof Double) ){
+                    throw new InterpreterException("Operands must be a numbers.", expr.operator);
+                }
                 return (double) left * (double) right;
             case SLASH:
+                if(!(left instanceof Double) || !(right instanceof Double) ){
+                    throw new InterpreterException("Operands must be a numbers.", expr.operator);
+                }
                 return (double) left / (double) right;
             case GREATER:
                 return (double) left > (double) right;
