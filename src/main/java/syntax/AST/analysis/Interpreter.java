@@ -45,12 +45,24 @@ public class Interpreter implements ExpressionVisitor<Object> {
                 }
                 return (double) left / (double) right;
             case GREATER:
+                if(! (right instanceof Double) || ! (left instanceof Double)){
+                    throw new InterpreterException("Operands must be a numbers.", expr.operator);
+                }
                 return (double) left > (double) right;
             case GREATER_EQUAL:
+                if(! (right instanceof Double) || ! (left instanceof Double)){
+                    throw new InterpreterException("Operands must be a numbers.", expr.operator);
+                }
                 return (double) left >= (double) right;
             case LESS:
+                if(! (right instanceof Double) || ! (left instanceof Double)){
+                    throw new InterpreterException("Operands must be a numbers.", expr.operator);
+                }
                 return (double) left < (double) right;
             case LESS_EQUAL:
+                if(! (right instanceof Double) || ! (left instanceof Double)){
+                    throw new InterpreterException("Operands must be a numbers.", expr.operator);
+                }
                 return (double) left <= (double) right;
             case BANG_EQUAL:
                 return !isEqual(left, right);
