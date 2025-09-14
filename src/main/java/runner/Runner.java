@@ -6,6 +6,7 @@ import syntax.AST.Parser;
 import syntax.AST.ParserException;
 import syntax.AST.analysis.AstPrinter;
 import syntax.AST.analysis.Interpreter;
+import syntax.AST.analysis.InterpreterException;
 import syntax.AST.expressions.Expression;
 
 import java.io.IOException;
@@ -81,10 +82,10 @@ public class Runner {
         Parser parser = new Parser(result.tokens);
         Expression e = parser.parse();
 
-        if(parserException !=null && e!=null){
+        if(parserException == null && e!=null){
             Interpreter interpreter = new Interpreter();
             Object res = interpreter.interpret(e);
-            if(res instanceof InterruptedException)
+            if(res instanceof InterpreterException)
                 System.exit(70);
             if(res == null)
                 System.out.println("nil");
