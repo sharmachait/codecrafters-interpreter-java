@@ -22,10 +22,16 @@ public class Interpreter implements ExpressionVisitor<Object> {
         Object right = expr.right.accept(this);
         switch (expr.operator.type){
             case MINUS:
+                if(!(left instanceof Double) || !(right instanceof Double) ){
+                    throw new InterpreterException("Operands must be a numbers.", expr.operator);
+                }
                 return (double) left - (double) right;
             case PLUS:
-                if(left instanceof String || right instanceof String){
+                if(left instanceof String && right instanceof String){
                     return ""+left+right;
+                }
+                if(left instanceof String || right instanceof String){
+                    throw new InterpreterException("Operands must be two numbers or two strings.", expr.operator);
                 }
                 return (double) left + (double) right;
             case STAR:
