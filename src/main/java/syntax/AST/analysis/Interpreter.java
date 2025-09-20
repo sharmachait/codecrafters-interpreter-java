@@ -1,12 +1,25 @@
 package syntax.AST.analysis;
 
 import syntax.AST.expressions.*;
+import syntax.AST.statements.ExpressionStatement;
+import syntax.AST.statements.Print;
+import syntax.AST.statements.Statement;
 
 import static lexicon.TokenType.*;
 
-public class Interpreter implements ExpressionVisitor<Object> {
+public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<Object> {
 
     public Object interpret(Expression e) {
+        try{
+            return e.accept(this);
+        } catch (InterpreterException ex) {
+            System.err.println(ex.getMessage());
+            System.err.println("[line "+ex.token.line+"]");
+            return ex;
+        }
+    }
+
+    public Object interpret(Statement e) {
         try{
             return e.accept(this);
         } catch (InterpreterException ex) {
@@ -117,5 +130,31 @@ public class Interpreter implements ExpressionVisitor<Object> {
         if(condition == null)return false;
         if(condition instanceof Boolean) return (Boolean) condition;
         return true;
+    }
+
+    @Override
+    public Object visitPrintStatement(Print expr) {
+        Object result = expr.expression.accept(this);
+        System.out.println(stringify(result));
+        return result;
+    }
+
+    private String stringify(Object result) {
+        if(result == null) return "nil";
+        if(result instanceof Double){
+            Double d = (Double) result;
+            if(d.intValue() == d){
+                int val = d.intValue();
+                return ""+val;
+            }else{
+                return result.toString();
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
+    public Object visitExpressionStatement(ExpressionStatement expr) {
+        return expr.expression.accept(this);
     }
 }

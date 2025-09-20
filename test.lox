@@ -1,1 +1,1 @@
--"world"
+print "hello world";

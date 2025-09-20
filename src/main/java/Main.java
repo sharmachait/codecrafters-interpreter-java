@@ -19,6 +19,9 @@ public class Main {
     }else if(command.equals("evaluate")){
       Runner.evaluate(filename);
       return;
+    }else if(command.equals("run")){
+      Runner.run(filename);
+      return;
     }
 
 

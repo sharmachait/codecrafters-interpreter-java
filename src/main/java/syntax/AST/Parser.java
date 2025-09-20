@@ -5,7 +5,11 @@ import lexicon.TokenType;
 import static lexicon.TokenType.*;
 import runner.Runner;
 import syntax.AST.expressions.*;
+import syntax.AST.statements.ExpressionStatement;
+import syntax.AST.statements.Print;
+import syntax.AST.statements.Statement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -67,6 +71,36 @@ public class Parser {
             return null;
         }
     }
+
+    public List<Statement> parseProgram() {
+        try{
+            List<Statement> statements = new ArrayList<>();
+            while(!isAtEnd()){
+                statements.add(statement());
+            }
+            return statements;
+        }catch (ParserException e){
+            return null;
+        }
+    }
+
+    private Statement statement() {
+        if(matchCurrentToken(PRINT)) return printStatement();
+        return expressionStatement();
+    }
+
+    private Statement printStatement() {
+        Expression expression = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Print(expression);
+    }
+
+    private Statement expressionStatement() {
+        Expression expression = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new ExpressionStatement(expression);
+    }
+
     private Expression primary(){
         if(matchCurrentToken(FALSE)) return new Literal(false);
         if(matchCurrentToken(TRUE)) return new Literal(true);
@@ -177,4 +211,5 @@ public class Parser {
             }
         }
     }
+
 }

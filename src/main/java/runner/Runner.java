@@ -8,10 +8,12 @@ import syntax.AST.analysis.AstPrinter;
 import syntax.AST.analysis.Interpreter;
 import syntax.AST.analysis.InterpreterException;
 import syntax.AST.expressions.Expression;
+import syntax.AST.statements.Statement;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Runner {
     private static ParserException parserException = null;
@@ -103,6 +105,31 @@ public class Runner {
                 }
             }
 
+        }else{
+            System.exit(65);
+        }
+    }
+
+    public static void run(String filename) {
+        String fileContents = getFileContents(filename);
+        if (fileContents == null) return;
+
+        Lexer lexer = new Lexer(fileContents);
+        Lexer.Result result = lexer.scan();
+        if(result.exception != null) {
+            System.exit(65);
+        }
+
+        Parser parser = new Parser(result.tokens);
+        List<Statement> statements = parser.parseProgram();
+
+        if(parserException == null && statements!=null){
+            Interpreter interpreter = new Interpreter();
+            for(Statement s: statements){
+                Object res = interpreter.interpret(s);
+                if(res instanceof InterpreterException)
+                    System.exit(70);
+            }
         }else{
             System.exit(65);
         }

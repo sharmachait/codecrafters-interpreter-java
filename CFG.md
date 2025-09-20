@@ -56,3 +56,20 @@ primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression "
 ```
 
 but commas cause issues with function parameters and arguments so we will drop that
+
+```cfg 
+program        → statement * EOF ;
+statement      → printStmt | exprStmt ;
+printStmt      → "print" expression ";" ;
+exprStmt       → expression ";" ;
+expression     → comma ;  
+comma          → ternary ( "," ternary )* ;  
+ternary        → assignment ( "?" expression ":" ternary )? ;  
+assignment     → equality ;  
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;  
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;  
+term           → factor ( ( "-" | "+" ) factor )* ;  
+factor         → unary ( ( "/" | "*" ) unary )* ;  
+unary          → ( "!" | "-" ) unary | primary ;  
+primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;  
+```
