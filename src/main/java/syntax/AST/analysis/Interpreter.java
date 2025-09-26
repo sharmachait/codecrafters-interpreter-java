@@ -4,11 +4,13 @@ import syntax.AST.expressions.*;
 import syntax.AST.statements.ExpressionStatement;
 import syntax.AST.statements.Print;
 import syntax.AST.statements.Statement;
+import syntax.AST.statements.VarDecl;
 
 import static lexicon.TokenType.*;
 
 public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<Object> {
 
+    private Environment env = new Environment();
     public Object interpret(Expression e) {
         try{
             return e.accept(this);
@@ -126,6 +128,11 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
         }
     }
 
+    @Override
+    public Object visitVariable(Variable variable) {
+        return env.get(variable.name);
+    }
+
     private boolean isTruthy(Object condition) {
         if(condition == null)return false;
         if(condition instanceof Boolean) return (Boolean) condition;
@@ -156,5 +163,13 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
     @Override
     public Object visitExpressionStatement(ExpressionStatement expr) {
         return expr.expression.accept(this);
+    }
+
+    @Override
+    public Object visitVarDecl(VarDecl varDecl) {
+        Object value = null;
+        if(varDecl.initializer!=null) value = varDecl.initializer.accept(this);
+        env.define(varDecl.name.lexeme, value);
+        return value;
     }
 }

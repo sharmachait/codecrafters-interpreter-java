@@ -57,4 +57,9 @@ public class AstPrinter implements ExpressionVisitor<String> {
 
         return sb.toString();
     }
+
+    @Override
+    public String visitVariable(Variable variable) {
+        return parenthesize("Variable", variable);
+    }
 }

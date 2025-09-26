@@ -8,6 +8,7 @@ import syntax.AST.expressions.*;
 import syntax.AST.statements.ExpressionStatement;
 import syntax.AST.statements.Print;
 import syntax.AST.statements.Statement;
+import syntax.AST.statements.VarDecl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,12 +77,44 @@ public class Parser {
         try{
             List<Statement> statements = new ArrayList<>();
             while(!isAtEnd()){
-                statements.add(statement());
+                statements.add(declaration());
             }
             return statements;
         }catch (ParserException e){
             return null;
         }
+    }
+
+    private Statement declaration() {
+        try{
+            if(matchCurrentToken(VAR)) return varDeclaration();
+            return statement();
+        } catch (Exception e) {
+            skipCurrentStatement();
+            return null;
+        }
+    }
+
+
+    private void skipCurrentStatement() {
+        advance();
+        while(!isAtEnd()){
+            if(previous().type == SEMICOLON) return;
+            switch (peek().type) {
+                case CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN:
+                    return;
+            }
+            advance();
+        }
+    }
+
+    private Statement varDeclaration() {
+        Variable var = (Variable)primary();
+        Token name = var.name;
+        Expression initializer = null;
+        if(matchCurrentToken(EQUAL)) initializer = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new VarDecl(name, initializer);
     }
 
     private Statement statement() {
@@ -105,10 +138,9 @@ public class Parser {
         if(matchCurrentToken(FALSE)) return new Literal(false);
         if(matchCurrentToken(TRUE)) return new Literal(true);
         if(matchCurrentToken(NIL)) return new Literal(null);
+        if(matchCurrentToken(IDENTIFIER)) return new Variable(previous());
+        if(matchCurrentToken(NUMBER,STRING))return new Literal(previous().literal);
 
-        if(matchCurrentToken(NUMBER,STRING)){
-            return new Literal(previous().literal);
-        }
 
         if(matchCurrentToken(LEFT_PAREN)){
             Expression expr = expression();

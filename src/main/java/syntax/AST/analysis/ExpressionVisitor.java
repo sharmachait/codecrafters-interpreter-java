@@ -8,4 +8,6 @@ public interface ExpressionVisitor<R> {
     R visitGrouping(Grouping expr);
     R visitLiteral(Literal expr);
     R visitTernary(Ternary ternary);
+
+    R visitVariable(Variable variable);
 }
