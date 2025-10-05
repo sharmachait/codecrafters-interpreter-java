@@ -16,4 +16,11 @@ public class Environment {
         }
         throw new InterpreterException("Undefined variable '" + name.lexeme + "'.", name);
     }
+    void assign(Token name, Object value){
+        if(values.containsKey(name.lexeme)){
+            values.put(name.lexeme, value);
+            return;
+        }
+        throw new InterpreterException("Undefined variable '" + name.lexeme + "'.", name);
+    }
 }

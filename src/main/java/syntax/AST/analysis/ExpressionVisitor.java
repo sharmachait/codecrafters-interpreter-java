@@ -10,4 +10,6 @@ public interface ExpressionVisitor<R> {
     R visitTernary(Ternary ternary);
 
     R visitVariable(Variable variable);
+
+    R visitAssignment(Assignment assignment);
 }

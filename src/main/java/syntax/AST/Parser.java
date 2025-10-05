@@ -168,7 +168,7 @@ public class Parser {
     private Expression ternary() {
         //ternary        -> equality ( "?" ternary ":" ternary )* ;
         handleBinaryOperatorWithoutLeftExpression(QUESTION);
-        Expression expr = equality();
+        Expression expr = assignment();
         if(matchCurrentToken(QUESTION)){
             Expression trueBranch = ternary();
             Token operator =consume(COLON, "Colon Expected after ? of ternary expression.");
@@ -176,6 +176,21 @@ public class Parser {
             expr = new Ternary(expr, trueBranch, falseBranch);
         }
         return expr;
+    }
+
+    private Expression assignment() {
+        // assignment     → IDENTIFIER "=" assignment | equality ;
+        Expression lhs = equality();
+        if(matchCurrentToken(EQUAL)){
+            Token equals = previous();
+            Expression rhs = assignment();
+            if(lhs instanceof Variable) {
+                Token name = ((Variable)lhs).name;
+                return new Assignment(name, rhs);
+            }
+            throw report(equals, "Invalid Assignment target.");
+        }
+        return lhs;
     }
 
     private Expression equality() {

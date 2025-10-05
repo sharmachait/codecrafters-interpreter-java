@@ -133,6 +133,14 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
         return env.get(variable.name);
     }
 
+    @Override
+    public Object visitAssignment(Assignment assignment) {
+        //a=1; -> 1 -> a=(b=1) -> a=1
+        Object value = assignment.value.accept(this);
+        env.assign(assignment.name, value);
+        return value;
+    }
+
     private boolean isTruthy(Object condition) {
         if(condition == null)return false;
         if(condition instanceof Boolean) return (Boolean) condition;
