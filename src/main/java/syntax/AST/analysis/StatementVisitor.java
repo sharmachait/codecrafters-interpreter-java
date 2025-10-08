@@ -1,5 +1,6 @@
 package syntax.AST.analysis;
 
+import syntax.AST.statements.Block;
 import syntax.AST.statements.ExpressionStatement;
 import syntax.AST.statements.Print;
 import syntax.AST.statements.VarDecl;
@@ -9,4 +10,6 @@ public interface StatementVisitor<R> {
     R visitExpressionStatement(ExpressionStatement expr);
 
     R visitVarDecl(VarDecl varDecl);
+
+    R visitBlockStatement(Block block);
 }

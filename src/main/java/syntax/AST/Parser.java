@@ -5,10 +5,7 @@ import lexicon.TokenType;
 import static lexicon.TokenType.*;
 import runner.Runner;
 import syntax.AST.expressions.*;
-import syntax.AST.statements.ExpressionStatement;
-import syntax.AST.statements.Print;
-import syntax.AST.statements.Statement;
-import syntax.AST.statements.VarDecl;
+import syntax.AST.statements.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +116,21 @@ public class Parser {
 
     private Statement statement() {
         if(matchCurrentToken(PRINT)) return printStatement();
+        if(matchCurrentToken(LEFT_BRACE)) return new Block(block());
         return expressionStatement();
+    }
+
+    private List<Statement> block(){
+        List<Statement> statements = new ArrayList<>();
+
+        while(!checkCurrentType(RIGHT_BRACE) && !isAtEnd()){
+            Statement stmt = declaration();
+            statements.add(stmt);
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+
+        return statements;
     }
 
     private Statement printStatement() {

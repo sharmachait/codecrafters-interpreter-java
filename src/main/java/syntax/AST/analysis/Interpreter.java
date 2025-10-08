@@ -1,10 +1,9 @@
 package syntax.AST.analysis;
 
 import syntax.AST.expressions.*;
-import syntax.AST.statements.ExpressionStatement;
-import syntax.AST.statements.Print;
-import syntax.AST.statements.Statement;
-import syntax.AST.statements.VarDecl;
+import syntax.AST.statements.*;
+
+import java.util.List;
 
 import static lexicon.TokenType.*;
 
@@ -179,5 +178,25 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
         if(varDecl.initializer!=null) value = varDecl.initializer.accept(this);
         env.define(varDecl.name.lexeme, value);
         return value;
+    }
+
+    @Override
+    public Object visitBlockStatement(Block block) {
+        return executeBlock(block.statements, new Environment(env));
+    }
+
+    private Object executeBlock(List<Statement> statements, Environment scopedEnv) {
+        Environment prev = env;
+        Object res = null;
+        try{
+            this.env = scopedEnv;
+            for(Statement stmt: statements){
+                res = stmt.accept(this);
+            }
+        }finally {
+            this.env = prev;
+        }
+
+        return res;
     }
 }
