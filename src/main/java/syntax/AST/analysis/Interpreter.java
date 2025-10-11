@@ -1,5 +1,7 @@
 package syntax.AST.analysis;
 
+import lexicon.Token;
+import lexicon.TokenType;
 import syntax.AST.expressions.*;
 import syntax.AST.statements.*;
 
@@ -138,6 +140,20 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
         Object value = assignment.value.accept(this);
         env.assign(assignment.name, value);
         return value;
+    }
+
+    @Override
+    public Object visitLogical(Logical logical) {
+        Object left = logical.left.accept(this);
+        Token operator = logical.operator;
+        if(operator.type == TokenType.OR){
+            // short circuit for true or ()
+            if(isTruthy(left)) return left;
+        }else{
+            // short circuit for false and ()
+            if(!isTruthy(left)) return left;
+        }
+        return logical.right.accept(this);
     }
 
     private boolean isTruthy(Object condition) {

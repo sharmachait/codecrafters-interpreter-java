@@ -203,8 +203,8 @@ public class Parser {
     }
 
     private Expression assignment() {
-        // assignment     → IDENTIFIER "=" assignment | equality ;
-        Expression lhs = equality();
+        // assignment     → IDENTIFIER "=" assignment | or ;
+        Expression lhs = or();
         if(matchCurrentToken(EQUAL)){
             Token equals = previous();
             Expression rhs = assignment();
@@ -215,6 +215,30 @@ public class Parser {
             throw report(equals, "Invalid Assignment target.");
         }
         return lhs;
+    }
+
+    private Expression or(){
+        // logic_or       → logic_and ( "or" logic_and )* ;
+        handleBinaryOperatorWithoutLeftExpression(OR);
+        Expression left = and();
+        while(matchCurrentToken(OR)){
+            Token operator = previous(); // and
+            Expression right = and();
+            left = new Logical(left, operator,right);
+        }
+        return left;
+    }
+
+    private Expression and(){
+        // logic_and      → equality ( "and" equality )* ;
+        handleBinaryOperatorWithoutLeftExpression(AND);
+        Expression left = equality();
+        while(matchCurrentToken(AND)){
+            Token operator = previous(); // and
+            Expression right = equality();
+            left = new Logical(left, operator,right);
+        }
+        return left;
     }
 
     private Expression equality() {
