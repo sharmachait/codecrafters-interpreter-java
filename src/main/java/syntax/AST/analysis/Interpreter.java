@@ -185,6 +185,18 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
         return executeBlock(block.statements, new Environment(env));
     }
 
+    @Override
+    public Object visitIfStatement(If stmt) {
+        Object res = null;
+        Object condition = stmt.condition.accept(this);
+        if(isTruthy(condition)){
+            res = stmt.thenBranch.accept(this);
+        }else if(stmt.elseBranch!=null){
+            res = stmt.elseBranch.accept(this);
+        }
+        return res;
+    }
+
     private Object executeBlock(List<Statement> statements, Environment scopedEnv) {
         Environment prev = env;
         Object res = null;

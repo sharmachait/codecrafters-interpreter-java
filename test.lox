@@ -1,4 +1,3 @@
-var a;
-var b = 2;
-var a = b = 1;
-print a;
+if (true) {
+  print "block body";
+}

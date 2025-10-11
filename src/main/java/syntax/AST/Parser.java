@@ -116,8 +116,21 @@ public class Parser {
 
     private Statement statement() {
         if(matchCurrentToken(PRINT)) return printStatement();
+        if(matchCurrentToken(IF)) return ifStatement();
         if(matchCurrentToken(LEFT_BRACE)) return new Block(block());
         return expressionStatement();
+    }
+
+    private Statement ifStatement() {
+        // ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expression condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+        Statement thenBranch = statement();
+        // if(true) if(true) else {}
+        Statement elseBranch = null;
+        if(matchCurrentToken(ELSE)) elseBranch = statement();
+        return new If(condition,thenBranch,elseBranch);
     }
 
     private List<Statement> block(){

@@ -1,9 +1,6 @@
 package syntax.AST.analysis;
 
-import syntax.AST.statements.Block;
-import syntax.AST.statements.ExpressionStatement;
-import syntax.AST.statements.Print;
-import syntax.AST.statements.VarDecl;
+import syntax.AST.statements.*;
 
 public interface StatementVisitor<R> {
     R visitPrintStatement(Print expr);
@@ -12,4 +9,6 @@ public interface StatementVisitor<R> {
     R visitVarDecl(VarDecl varDecl);
 
     R visitBlockStatement(Block block);
+
+    R visitIfStatement(If stmt);
 }
