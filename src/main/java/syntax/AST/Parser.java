@@ -224,7 +224,7 @@ public class Parser {
         while(matchCurrentToken(OR)){
             Token operator = previous(); // and
             Expression right = and();
-            left = new Logical(left, operator,right);
+            left = new Logical(left, operator, right);
         }
         return left;
     }

@@ -1,1 +1,1 @@
-print nil or "ok";
+print 75 or true;
