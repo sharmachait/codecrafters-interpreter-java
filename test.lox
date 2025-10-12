@@ -1,1 +1,6 @@
-print 75 or true;
+var foo = 0;
+while (foo < 3) {
+    if(foo == 1) continue;
+    print foo = foo + 1;
+
+}

@@ -11,4 +11,10 @@ public interface StatementVisitor<R> {
     R visitBlockStatement(Block block);
 
     R visitIfStatement(If stmt);
+
+    R visitWhileStatement(While aWhile);
+
+    R visitBreakStatement(Break aBreak);
+
+    R visitContinueStatement(Continue aContinue);
 }

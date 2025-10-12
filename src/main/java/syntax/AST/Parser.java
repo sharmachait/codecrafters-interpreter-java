@@ -117,8 +117,31 @@ public class Parser {
     private Statement statement() {
         if(matchCurrentToken(PRINT)) return printStatement();
         if(matchCurrentToken(IF)) return ifStatement();
+        if(matchCurrentToken(WHILE)) return whileStatement();
+        if(matchCurrentToken(BREAK)) return breakStatement();
+        if(matchCurrentToken(CONTINUE)) return continueStatement();
         if(matchCurrentToken(LEFT_BRACE)) return new Block(block());
         return expressionStatement();
+    }
+
+    private Statement continueStatement() {
+        Token token = previous();
+        consume(SEMICOLON, "Expect ';' after break.");
+        return new Continue(token);
+    }
+
+    private Statement breakStatement() {
+        Token token = previous();
+        consume(SEMICOLON, "Expect ';' after break.");
+        return new Break(token);
+    }
+
+    private Statement whileStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expression condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        Statement body = statement();
+        return new While(condition, body);
     }
 
     private Statement ifStatement() {

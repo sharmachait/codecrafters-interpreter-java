@@ -213,6 +213,31 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
         return res;
     }
 
+    @Override
+    public Object visitWhileStatement(While stmt) {
+        Object res = null;
+        while (isTruthy(stmt.condition.accept(this))){
+            try{
+                res = stmt.body.accept(this);
+            } catch (ContinueException e) {
+                continue;
+            }catch (BreakException e){
+                break;
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public Object visitBreakStatement(Break stmt) {
+        throw new BreakException();
+    }
+
+    @Override
+    public Object visitContinueStatement(Continue stmt) {
+        throw new ContinueException();
+    }
+
     private Object executeBlock(List<Statement> statements, Environment scopedEnv) {
         Environment prev = env;
         Object res = null;
