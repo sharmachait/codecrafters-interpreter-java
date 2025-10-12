@@ -120,8 +120,78 @@ public class Parser {
         if(matchCurrentToken(WHILE)) return whileStatement();
         if(matchCurrentToken(BREAK)) return breakStatement();
         if(matchCurrentToken(CONTINUE)) return continueStatement();
+        if(matchCurrentToken(FOR)) return forStatement();
         if(matchCurrentToken(LEFT_BRACE)) return new Block(block());
         return expressionStatement();
+    }
+
+    private Statement forStatement() {
+        // forStmt        → "for" "(" ( varDecl | exprStmt | ";") expression? ";" expression? ")" statement ;
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        Statement initializer;
+        if(matchCurrentToken(SEMICOLON)){
+            initializer = null;
+        }else if(matchCurrentToken(VAR)){
+            initializer = varDeclaration();
+        }else{
+            initializer = expressionStatement();
+        }
+
+        Expression condition = null;
+        if(!checkCurrentType(SEMICOLON)){
+            condition = expression();
+        }
+
+        if(condition == null) condition = new Literal(true);
+
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+
+        Expression incer = null;
+        if(!checkCurrentType(RIGHT_PAREN)){
+            incer = expression();
+        }
+
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        /*
+         * {
+         * body => block | statement
+         * incerStatement
+         * }
+         */
+
+        Statement body = statement();
+
+        if(incer!=null){
+            body = new Block(
+                    List.of(
+                            body,
+                            new ExpressionStatement(incer)
+                    )
+            );
+        }
+
+        Statement whileLoop = new While(condition, body);
+
+        /*
+         *{
+         * initializer
+         *  {
+         *  body => block | statement,
+         *  incerStatement
+         *  }
+         * }
+         */
+
+        if(initializer!=null){
+            whileLoop = new Block(
+                    List.of(initializer, whileLoop)
+            ) ;
+        }
+
+        return whileLoop;
+
     }
 
     private Statement continueStatement() {
