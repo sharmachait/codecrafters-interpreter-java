@@ -3,8 +3,12 @@ package syntax.AST.analysis;
 import lexicon.Token;
 import lexicon.TokenType;
 import syntax.AST.expressions.*;
+import syntax.AST.functions.Clock;
+import syntax.AST.functions.LoxCallable;
+import syntax.AST.functions.ReadLine;
 import syntax.AST.statements.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static lexicon.TokenType.*;
@@ -12,6 +16,10 @@ import static lexicon.TokenType.*;
 public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<Object> {
 
     private Environment env = new Environment();
+    public Interpreter(){
+        env.define("clock", new Clock());
+        env.define("readLine", new ReadLine());
+    }
     public Object interpret(Expression e) {
         try{
             return e.accept(this);
@@ -154,6 +162,31 @@ public class Interpreter implements ExpressionVisitor<Object>, StatementVisitor<
             if(!isTruthy(left)) return left;
         }
         return logical.right.accept(this);
+    }
+
+    @Override
+    public Object visitCallExpression(Call call) {
+        Object callee = call.callee.accept(this);
+
+        if(!(callee instanceof LoxCallable)){
+            throw new InterpreterException("Can only call functions and classes.", call.paren);
+        }
+
+        List<Object> arguments = new ArrayList<>();
+
+        for(Expression arg: call.arguments){
+            arguments.add(arg.accept(this));
+        }
+
+        LoxCallable function = (LoxCallable) callee;
+
+        if(function.arity() != arguments.size()){
+            throw new InterpreterException(
+                    "Expected " + function.arity() + " arguments but got " + arguments.size() + ".",
+                    call.paren);
+        }
+
+        return function.call(this, arguments);
     }
 
     private boolean isTruthy(Object condition) {

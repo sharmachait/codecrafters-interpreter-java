@@ -24,7 +24,6 @@ public class Main {
       return;
     }
 
-
     System.err.println("Unknown command: " + command);
     System.exit(1);
   }

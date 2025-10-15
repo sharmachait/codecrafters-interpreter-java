@@ -14,4 +14,6 @@ public interface ExpressionVisitor<R> {
     R visitAssignment(Assignment assignment);
 
     R visitLogical(Logical logical);
+
+    R visitCallExpression(Call call);
 }

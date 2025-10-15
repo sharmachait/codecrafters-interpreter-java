@@ -383,14 +383,46 @@ public class Parser {
     }
 
     private Expression unary() {
-        //unary          -> ( "-" | "!" ) unary | primary ;
+        //unary          -> ( "-" | "!" ) unary | call ;
         if(matchCurrentToken(BANG, MINUS)){
             Token operator = previous();
             Expression right = unary();
             return new Unary(operator, right);
         }
-        return primary();
+        return call();
     }
+
+    private Expression call() {
+        // call           → primary ( "(" arguments? ")" )* ;
+        Expression expr = primary();
+        List<Expression> arguments = new ArrayList<>();
+        while(true){
+            if(matchCurrentToken(LEFT_PAREN)){
+                if(!checkCurrentType(RIGHT_PAREN)) arguments = arguments();
+                Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+                expr = new Call(expr,paren,arguments);
+            }else{
+                break;
+            }
+        }
+        return expr;
+    }
+
+    private List<Expression> arguments() {
+        //arguments      → expression ("," expression )* ; //
+        List<Expression> arguments = new ArrayList<>();
+
+        Expression arg = expression();
+        arguments.add(arg);
+        while(matchCurrentToken(COMMA)){
+            if(arguments.size() >= 255){
+                report(peek(), "Can't have more than 255 arguments.");
+            }
+            arguments.add(expression());
+        }
+        return arguments;
+    }
+
     private void handleBinaryOperatorWithoutLeftExpression(TokenType... types){
         for(TokenType type: types){
             if(checkCurrentType(type)){
